@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI SOC Alert Classifier</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <aside class="sidebar">
+      <div class="brand">
+        <span class="brand-mark">AI</span>
+        <div>
+          <h1>SOC Classifier</h1>
+          <p>Real-time alert triage</p>
+        </div>
+      </div>
+
+      <nav>
+        <a class="active" href="#dashboard">Dashboard</a>
+        <a href="#alerts">Alerts</a>
+        <a href="#intel">Intel</a>
+        <a href="#ingest">Manual Ingest</a>
+        <a href="#model">Model</a>
+      </nav>
+
+      <section class="model-panel" id="model">
+        <h2>AI Service</h2>
+        <p id="modelName">Loading model...</p>
+        <small id="modelRole"></small>
+      </section>
+    </aside>
+
+    <main>
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">SOC Environment</p>
+          <h2>AI-Powered Real-Time Threat Classification</h2>
+        </div>
+        <div class="actions">
+          <button id="burstBtn" type="button">Generate Burst</button>
+          <button id="incidentBtn" type="button">Generate Incident</button>
+          <button id="simBtn" type="button" class="primary">Start Simulator</button>
+        </div>
+      </header>
+
+      <section class="stats" id="dashboard">
+        <article>
+          <span>Total Alerts</span>
+          <strong id="totalCount">0</strong>
+        </article>
+        <article>
+          <span>Critical</span>
+          <strong id="criticalCount">0</strong>
+        </article>
+        <article>
+          <span>High</span>
+          <strong id="highCount">0</strong>
+        </article>
+        <article>
+          <span>Low / Safe</span>
+          <strong id="lowCount">0</strong>
+        </article>
+      </section>
+
+      <section class="workspace">
+        <div class="alerts-panel" id="alerts">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Live Stream</p>
+              <h3>Classified Alerts</h3>
+            </div>
+            <button id="clearBtn" type="button" class="ghost">Clear</button>
+          </div>
+          <div class="filters">
+            <input id="searchInput" type="search" placeholder="Search IP, user, host, or rule" />
+            <select id="priorityFilter">
+              <option value="">All priorities</option>
+              <option value="critical">Critical</option>
+              <option value="high">High</option>
+              <option value="medium">Medium</option>
+              <option value="low">Low</option>
+            </select>
+            <select id="statusFilter">
+              <option value="">All statuses</option>
+              <option value="new">New</option>
+              <option value="in_review">In Review</option>
+              <option value="escalated">Escalated</option>
+              <option value="closed">Closed</option>
+              <option value="false_positive">False Positive</option>
+            </select>
+            <button id="applyFiltersBtn" type="button">Apply</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Priority</th>
+                  <th>Status</th>
+                  <th>Category</th>
+                  <th>Source</th>
+                  <th>Rule</th>
+                  <th>Asset</th>
+                  <th>Risk</th>
+                  <th>MITRE</th>
+                </tr>
+              </thead>
+              <tbody id="alertRows"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <aside class="detail-panel">
+          <div class="section-heading compact">
+            <div>
+              <p class="eyebrow">Analyst View</p>
+              <h3>Selected Alert</h3>
+            </div>
+          </div>
+          <div id="emptyDetail" class="empty-state">Select an alert to see explanation and response guidance.</div>
+          <div id="detailContent" class="detail hidden">
+            <div class="detail-title">
+              <span id="detailPriority"></span>
+              <h4 id="detailCategory"></h4>
+            </div>
+            <div class="status-actions">
+              <select id="statusSelect">
+                <option value="new">New</option>
+                <option value="in_review">In Review</option>
+                <option value="escalated">Escalated</option>
+                <option value="closed">Closed</option>
+                <option value="false_positive">False Positive</option>
+              </select>
+              <button id="saveStatusBtn" type="button">Save</button>
+              <a id="reportLink" href="#" target="_blank" rel="noreferrer">Report</a>
+            </div>
+            <dl>
+              <div>
+                <dt>Confidence</dt>
+                <dd id="detailConfidence"></dd>
+              </div>
+              <div>
+                <dt>Source IP</dt>
+                <dd id="detailSourceIp"></dd>
+              </div>
+              <div>
+                <dt>User</dt>
+                <dd id="detailUser"></dd>
+              </div>
+              <div>
+                <dt>Rule</dt>
+                <dd id="detailRule"></dd>
+              </div>
+              <div>
+                <dt>Model</dt>
+                <dd id="detailModel"></dd>
+              </div>
+            </dl>
+            <h5>Explanation</h5>
+            <p id="detailExplanation"></p>
+            <h5>Recommended Action</h5>
+            <p id="detailAction"></p>
+            <h5>Analyst Note</h5>
+            <textarea id="noteInput" class="note-input" placeholder="Add investigation note"></textarea>
+            <button id="addNoteBtn" type="button">Add Note</button>
+          </div>
+        </aside>
+      </section>
+
+      <section class="intel-grid" id="intel">
+        <div class="intel-panel">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">MITRE ATT&CK</p>
+              <h3>Technique Coverage</h3>
+            </div>
+          </div>
+          <div id="mitreList" class="list"></div>
+        </div>
+
+        <div class="intel-panel">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Correlation</p>
+              <h3>Related Incidents</h3>
+            </div>
+          </div>
+          <div id="incidentList" class="list"></div>
+        </div>
+      </section>
+
+      <section class="ingest" id="ingest">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Connector Test</p>
+            <h3>Send a Manual Alert</h3>
+          </div>
+          <button id="sendAlertBtn" type="button" class="primary">Send Alert</button>
+        </div>
+        <textarea id="manualAlert" spellcheck="false"></textarea>
+      </section>
+    </main>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>

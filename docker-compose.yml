@@ -1,0 +1,13 @@
+services:
+  soc-app:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - soc-data:/data
+    environment:
+      - PYTHONUNBUFFERED=1
+      - SOC_DB_PATH=/data/soc_alerts.db
+
+volumes:
+  soc-data:
